@@ -13,6 +13,7 @@ import {
   TableRow,
   Paper,
 } from '@mui/material';
+import { numberToWords } from './utility';  // Import the utility function
 
 const LoanSummaryAggregator = ({ loans }) => {
   const [showAmortization, setShowAmortization] = useState(false);
@@ -73,19 +74,19 @@ const LoanSummaryAggregator = ({ loans }) => {
   return (
     <Card elevation={3} style={{ marginBottom: '20px', padding: '20px' }}>
       <CardContent>
-        <Typography variant="h5" style={{ fontWeight: 'bold', color: '#2c3e50' }}>
-          Aggregated Loan Summary
-        </Typography>
-        <Divider style={{ marginBottom: '15px' }} />
-        <Typography variant="subtitle1">
-          <strong>Total Monthly EMI:</strong> ₹{totalEMI.toLocaleString('en-IN')}
-        </Typography>
-        <Typography variant="subtitle1">
-          <strong>Total Interest:</strong> ₹{totalInterest.toLocaleString('en-IN')}
-        </Typography>
-        <Typography variant="subtitle1">
-          <strong>Total Principal:</strong> ₹{totalPrincipal.toLocaleString('en-IN')}
-        </Typography>
+      <Typography variant="h5" style={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                    Aggregated Loan Summary
+                </Typography>
+                <Divider style={{ marginBottom: '15px' }} />
+                <Typography variant="subtitle1">
+                    <strong>Total Monthly EMI:</strong> ₹{totalEMI.toLocaleString('en-IN')} ({numberToWords(totalEMI)})
+                </Typography>
+                <Typography variant="subtitle1">
+                    <strong>Total Interest:</strong> ₹{totalInterest.toLocaleString('en-IN')} ({numberToWords(totalInterest)})
+                </Typography>
+                <Typography variant="subtitle1">
+                    <strong>Total Principal:</strong> ₹{totalPrincipal.toLocaleString('en-IN')} ({numberToWords(totalPrincipal)})
+                </Typography>
       </CardContent>
 
       <CardContent>
@@ -118,9 +119,9 @@ const LoanSummaryAggregator = ({ loans }) => {
                 {aggregatedAmortization.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.month}</TableCell>
-                    <TableCell align="right">₹{Number(row.interest).toLocaleString('en-IN')}</TableCell>
-                    <TableCell align="right">₹{Number(row.principal).toLocaleString('en-IN')}</TableCell>
-                    <TableCell align="right">₹{Number(row.remainingBalance).toLocaleString('en-IN')}</TableCell>
+                    <TableCell align="right">₹{Number(row.interest).toLocaleString('en-IN')} ({numberToWords(Number(row.interest))})</TableCell>
+                    <TableCell align="right">₹{Number(row.principal).toLocaleString('en-IN')} ({numberToWords(Number(row.principal))})</TableCell>
+                    <TableCell align="right">₹{Number(row.remainingBalance).toLocaleString('en-IN')} ({numberToWords(Number(row.remainingBalance))})</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
