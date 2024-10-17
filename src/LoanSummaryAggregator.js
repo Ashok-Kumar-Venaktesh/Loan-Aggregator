@@ -78,13 +78,13 @@ const LoanSummaryAggregator = ({ loans }) => {
         </Typography>
         <Divider style={{ marginBottom: '15px' }} />
         <Typography variant="subtitle1">
-          <strong>Total Monthly EMI:</strong> ₹{totalEMI.toFixed(2)}
+          <strong>Total Monthly EMI:</strong> ₹{totalEMI.toLocaleString('en-IN')}
         </Typography>
         <Typography variant="subtitle1">
-          <strong>Total Interest:</strong> ₹{totalInterest.toFixed(2)}
+          <strong>Total Interest:</strong> ₹{totalInterest.toLocaleString('en-IN')}
         </Typography>
         <Typography variant="subtitle1">
-          <strong>Total Principal:</strong> ₹{totalPrincipal.toLocaleString()}
+          <strong>Total Principal:</strong> ₹{totalPrincipal.toLocaleString('en-IN')}
         </Typography>
       </CardContent>
 
@@ -118,9 +118,9 @@ const LoanSummaryAggregator = ({ loans }) => {
                 {aggregatedAmortization.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.month}</TableCell>
-                    <TableCell align="right">₹{row.interest}</TableCell>
-                    <TableCell align="right">₹{row.principal}</TableCell>
-                    <TableCell align="right">₹{row.remainingBalance}</TableCell>
+                    <TableCell align="right">₹{Number(row.interest).toLocaleString('en-IN')}</TableCell>
+                    <TableCell align="right">₹{Number(row.principal).toLocaleString('en-IN')}</TableCell>
+                    <TableCell align="right">₹{Number(row.remainingBalance).toLocaleString('en-IN')}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
