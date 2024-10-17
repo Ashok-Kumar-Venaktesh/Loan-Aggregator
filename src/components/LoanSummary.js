@@ -9,7 +9,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Divider
 } from '@mui/material';
 
 const formatCurrency = (amount) => {
@@ -54,30 +58,47 @@ const LoanSummary = ({ loan, onEdit }) => {
   }
 
   return (
-    <Grid item xs={12}>
-      <Paper style={{ padding: 16 }}>
-        <Typography variant="h6">{loan.name} Summary</Typography>
-        <Typography>Loan Amount: {formatCurrency(loan.amount)}</Typography>
-        <Typography>Monthly EMI: {formatCurrency(loan.monthlyEMI)}</Typography>
-        <Typography>Total Interest: {formatCurrency(loan.totalInterest)}</Typography>
-        <Typography>Loan Type: {loan.loanType}</Typography>
-        <Typography>Start Date: {loan.startDate ? loan.startDate.toDateString() : 'N/A'}</Typography>
-        <Typography>End Date: {loan.endDate ? loan.endDate.toDateString() : 'N/A'}</Typography>
-
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => setShowAmortization(!showAmortization)}
-          style={{ marginTop: '20px' }}
-        >
-          {showAmortization ? 'Hide Amortization' : 'Show Amortization'}
-        </Button>
+    <Grid item xs={12} md={6} lg={4}>
+      <Card elevation={3} style={{ marginBottom: '20px' }}>
+        <CardContent>
+          <Typography variant="h6" style={{ marginBottom: '10px', fontWeight: 'bold' }}>
+            {loan.name} Summary
+          </Typography>
+          <Divider style={{ marginBottom: '10px' }} />
+          <Typography variant="body1"><strong>Loan Amount:</strong> {formatCurrency(loan.amount)}</Typography>
+          <Typography variant="body1"><strong>Monthly EMI:</strong> {formatCurrency(loan.monthlyEMI)}</Typography>
+          <Typography variant="body1"><strong>Total Interest:</strong> {formatCurrency(loan.totalInterest)}</Typography>
+          <Typography variant="body1"><strong>Loan Type:</strong> {loan.loanType}</Typography>
+          <Typography variant="body1"><strong>Start Date:</strong> {loan.startDate ? loan.startDate.toDateString() : 'N/A'}</Typography>
+          <Typography variant="body1"><strong>End Date:</strong> {loan.endDate ? loan.endDate.toDateString() : 'N/A'}</Typography>
+        </CardContent>
+        <CardActions>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setShowAmortization(!showAmortization)}
+            style={{ marginLeft: '10px' }}
+          >
+            {showAmortization ? 'Hide Amortization' : 'Show Amortization'}
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => onEdit(loan)}
+            style={{ marginLeft: 'auto' }}
+          >
+            Edit Loan
+          </Button>
+        </CardActions>
 
         {showAmortization && (
-          <div>
-            <Typography variant="h6" style={{ marginTop: '20px' }}>Amortization Schedule</Typography>
-            <TableContainer>
-              <Table>
+          <CardContent>
+            <Typography variant="h6" style={{ marginTop: '20px', marginBottom: '10px' }}>
+              Amortization Schedule
+            </Typography>
+            <Divider style={{ marginBottom: '10px' }} />
+            <TableContainer component={Paper} elevation={0} style={{ maxHeight: '300px', overflow: 'auto' }}>
+              <Table stickyHeader size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Month</TableCell>
@@ -106,18 +127,9 @@ const LoanSummary = ({ loan, onEdit }) => {
                 </TableBody>
               </Table>
             </TableContainer>
-          </div>
+          </CardContent>
         )}
-        
-        <Button
-          variant="outlined"
-          color="primary"
-          style={{ marginTop: '20px' }}
-          onClick={() => onEdit(loan)}
-        >
-          Edit Loan
-        </Button>
-      </Paper>
+      </Card>
     </Grid>
   );
 };
