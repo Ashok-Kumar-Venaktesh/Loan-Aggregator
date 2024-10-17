@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
-import { Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button
+} from '@mui/material';
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-IN', { 
-    style: 'currency', 
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 2
   }).format(amount);
 };
 
 const LoanSummary = ({ loan, onEdit }) => {
-  const [showAmortization, setShowAmortization] = useState(false); // Toggle state for amortization
+  const [showAmortization, setShowAmortization] = useState(false);
 
   const amortizationSchedule = [];
   let remainingBalance = loan.amount;
+  let totalInterestPaid = 0;
+  let totalPrincipalPaid = 0;
+
   const monthlyRate = loan.rate / 100 / 12;
 
-  for (let i = 1; i <= loan.months; i++) {
+  for (let i = 1; i <= loan.tenure; i++) {
     const interestPayment = remainingBalance * monthlyRate;
     const principalPayment = loan.monthlyEMI - interestPayment;
     remainingBalance -= principalPayment;
+
+    totalInterestPaid += interestPayment;
+    totalPrincipalPaid += principalPayment;
 
     const paymentDate = new Date(loan.startDate);
     paymentDate.setMonth(paymentDate.getMonth() + i - 1);
@@ -29,7 +46,10 @@ const LoanSummary = ({ loan, onEdit }) => {
       date: paymentDate.toDateString(),
       interest: interestPayment.toFixed(2),
       principal: principalPayment.toFixed(2),
-      balance: Math.abs(remainingBalance).toFixed(2),
+      remainingBalance: Math.abs(remainingBalance).toFixed(2),
+      totalInterestPaid: totalInterestPaid.toFixed(2),
+      totalPrincipalPaid: totalPrincipalPaid.toFixed(2),
+      remainingInterest: Math.max(0, (loan.totalInterest - totalInterestPaid)).toFixed(2)
     });
   }
 
@@ -40,8 +60,9 @@ const LoanSummary = ({ loan, onEdit }) => {
         <Typography>Loan Amount: {formatCurrency(loan.amount)}</Typography>
         <Typography>Monthly EMI: {formatCurrency(loan.monthlyEMI)}</Typography>
         <Typography>Total Interest: {formatCurrency(loan.totalInterest)}</Typography>
-        <Typography>Start Date: {loan.startDate.toDateString()}</Typography>
-        <Typography>End Date: {loan.endDate.toDateString()}</Typography>
+        <Typography>Loan Type: {loan.loanType}</Typography>
+        <Typography>Start Date: {loan.startDate ? loan.startDate.toDateString() : 'N/A'}</Typography>
+        <Typography>End Date: {loan.endDate ? loan.endDate.toDateString() : 'N/A'}</Typography>
 
         <Button
           variant="outlined"
@@ -64,6 +85,9 @@ const LoanSummary = ({ loan, onEdit }) => {
                     <TableCell>Interest Paid</TableCell>
                     <TableCell>Principal Paid</TableCell>
                     <TableCell>Remaining Balance</TableCell>
+                    <TableCell>Total Interest Paid</TableCell>
+                    <TableCell>Total Principal Paid</TableCell>
+                    <TableCell>Remaining Interest</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -73,7 +97,10 @@ const LoanSummary = ({ loan, onEdit }) => {
                       <TableCell>{row.date}</TableCell>
                       <TableCell>{formatCurrency(row.interest)}</TableCell>
                       <TableCell>{formatCurrency(row.principal)}</TableCell>
-                      <TableCell>{formatCurrency(row.balance)}</TableCell>
+                      <TableCell>{formatCurrency(row.remainingBalance)}</TableCell>
+                      <TableCell>{formatCurrency(row.totalInterestPaid)}</TableCell>
+                      <TableCell>{formatCurrency(row.totalPrincipalPaid)}</TableCell>
+                      <TableCell>{formatCurrency(row.remainingInterest)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -82,10 +109,10 @@ const LoanSummary = ({ loan, onEdit }) => {
           </div>
         )}
         
-        <Button 
-          variant="outlined" 
-          color="primary" 
-          style={{ marginTop: '20px' }} 
+        <Button
+          variant="outlined"
+          color="primary"
+          style={{ marginTop: '20px' }}
           onClick={() => onEdit(loan)}
         >
           Edit Loan

@@ -1,9 +1,20 @@
 import React, { useState } from 'react';
-import { Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
+import {
+  Grid,
+  Paper,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button
+} from '@mui/material';
 
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('en-IN', { 
-    style: 'currency', 
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 2
   }).format(amount);
@@ -13,10 +24,13 @@ const LoanSummaryAggregator = ({ loans }) => {
   const [showAmortization, setShowAmortization] = useState(false);
 
   const totalEMI = loans.reduce((sum, loan) => sum + parseFloat(loan.monthlyEMI), 0);
+  const totalPrincipalPaid = loans.reduce((sum, loan) => sum + (loan.amount - loan.remainingBalance), 0);
+  const totalInterestPaid = loans.reduce((sum, loan) => sum + parseFloat(loan.totalInterest), 0);
 
   const combinedAmortization = [];
   loans.forEach((loan) => {
     let remainingBalance = loan.amount;
+    let totalInterestPaid = 0;
     const monthlyRate = loan.rate / 100 / 12;
 
     for (let i = 1; i <= loan.months; i++) {
@@ -24,16 +38,20 @@ const LoanSummaryAggregator = ({ loans }) => {
       const principalPayment = loan.monthlyEMI - interestPayment;
       remainingBalance -= principalPayment;
 
+      totalInterestPaid += interestPayment;
+
       if (!combinedAmortization[i]) {
         combinedAmortization[i] = {
           month: i,
-          interest: 0,
-          principal: 0,
+          totalInterestPaid: 0,
+          totalPrincipalPaid: 0,
+          remainingInterest: 0
         };
       }
 
-      combinedAmortization[i].interest += parseFloat(interestPayment.toFixed(2));
-      combinedAmortization[i].principal += parseFloat(principalPayment.toFixed(2));
+      combinedAmortization[i].totalInterestPaid += interestPayment;
+      combinedAmortization[i].totalPrincipalPaid += principalPayment;
+      combinedAmortization[i].remainingInterest += Math.max(0, (loan.totalInterest - totalInterestPaid));
     }
   });
 
@@ -59,16 +77,18 @@ const LoanSummaryAggregator = ({ loans }) => {
               <TableHead>
                 <TableRow>
                   <TableCell>Month</TableCell>
-                  <TableCell>Interest Paid</TableCell>
-                  <TableCell>Principal Paid</TableCell>
+                  <TableCell>Total Interest Paid</TableCell>
+                  <TableCell>Total Principal Paid</TableCell>
+                  <TableCell>Remaining Interest</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {combinedAmortization.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell>{row.month}</TableCell>
-                    <TableCell>{formatCurrency(row.interest)}</TableCell>
-                    <TableCell>{formatCurrency(row.principal)}</TableCell>
+                    <TableCell>{formatCurrency(row.totalInterestPaid)}</TableCell>
+                    <TableCell>{formatCurrency(row.totalPrincipalPaid)}</TableCell>
+                    <TableCell>{formatCurrency(row.remainingInterest)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
