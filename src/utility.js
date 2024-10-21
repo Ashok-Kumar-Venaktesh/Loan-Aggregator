@@ -1,52 +1,41 @@
-// utility.js
 export const numberToWords = (num) => {
-    const singleDigits = [
-        "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"
+    if (isNaN(num)) return '';
+    const a = [
+      '', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve',
+      'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'
     ];
-    const twoDigits = [
-        "", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
-    ];
-    const tens = [
-        "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
-    ];
-    const thousands = [
-        "", "Thousand", "Lakh", "Crore"
-    ];
-
-    const words = [];
-
-    if (num === 0) {
-        return singleDigits[0];
-    }
-
-    // Split into sections (thousands, lakhs, crores)
-    let crore = Math.floor(num / 10000000);
-    let lakh = Math.floor((num % 10000000) / 100000);
-    let thousand = Math.floor((num % 100000) / 1000);
-    let remainder = num % 1000;
-
-    if (crore) {
-        words.push(numberToWords(crore), "Crore");
-    }
-    if (lakh) {
-        words.push(numberToWords(lakh), "Lakh");
-    }
-    if (thousand) {
-        words.push(numberToWords(thousand), "Thousand");
-    }
-
-    if (remainder) {
-        if (remainder < 10) {
-            words.push(singleDigits[remainder]);
-        } else if (remainder < 20) {
-            words.push(twoDigits[remainder - 10]);
-        } else {
-            words.push(tens[Math.floor(remainder / 10)]);
-            if (remainder % 10) {
-                words.push(singleDigits[remainder % 10]);
-            }
-        }
-    }
-
-    return words.join(" ").trim();
-};
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  
+    const convertToWords = (n) => {
+      if (n < 20) return a[n];
+      if (n < 100) return b[Math.floor(n / 10)] + (n % 10 !== 0 ? ' ' + a[n % 10] : '');
+      if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred' + (n % 100 !== 0 ? ' ' + convertToWords(n % 100) : '');
+      return '';
+    };
+  
+    const numberToIndianWords = (n) => {
+      if (n === 0) return 'Zero';
+      
+      let output = '';
+  
+      const crore = Math.floor(n / 10000000);
+      n %= 10000000;
+      const lakh = Math.floor(n / 100000);
+      n %= 100000;
+      const thousand = Math.floor(n / 1000);
+      n %= 1000;
+      const hundred = Math.floor(n / 100);
+      n %= 100;
+  
+      if (crore > 0) output += convertToWords(crore) + ' Crore ';
+      if (lakh > 0) output += convertToWords(lakh) + ' Lakh ';
+      if (thousand > 0) output += convertToWords(thousand) + ' Thousand ';
+      if (hundred > 0) output += convertToWords(hundred) + ' Hundred ';
+      if (n > 0) output += convertToWords(n);
+  
+      return output.trim();
+    };
+  
+    return numberToIndianWords(Math.floor(num));
+  };
+  
